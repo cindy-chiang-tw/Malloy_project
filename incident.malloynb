@@ -1,0 +1,136 @@
+>>>malloy
+source: incident is duckdb.table('UAC_SIR_NOTIFICATION_LIST_DATA_TABLE.csv') extend{
+  dimension:
+  -- create_date is strptime!date(`DATE_CREATED`, '%B %d %Y') 
+ notify_date is try_strptime!date(`DATE_NOTIFIED`, '%m/%d/%-y %H:%M')
+   --notify_date is `DATE_NOTIFIED`::date
+
+}
+source: abuse_id is duckdb.table('./LIST_ABUSE_ALLEGATIONS_DATA_TABLE.csv') extend{
+ primary_key:ABUSE_TYPE_ID
+}
+source: abuse_allegation is duckdb.table('./SIR_ABUSE_ALLEGATIONS_DATA_TABLE.csv') extend{
+ join_one:abuse_id with ABUSE_TYPE_ID
+}
+source: mm_id is duckdb.table('./LIST_SIR_MM_ISSUES_DATA_TABLE.csv') extend{
+ primary_key:MEDICAL_MENTAL_ISSUE_ID
+}
+source: mm_allegation is duckdb.table('./SIR_MEDICAL_MENTAL_ISSUES_DATA_TABLE.csv') extend{
+ join_one:mm_id with MEDICAL_MENTAL_ISSUE_ID
+}
+source: cate is duckdb.table('./LIST_PROGRAMS_DATA_TABLE.csv') extend{
+primary_key:PROGRAM_ID
+}
+source: program_allegation is duckdb.table('./PROGRAM_LEVEL_EVENTS_INFO_DATA_TABLE.csv') extend{
+ join_one:cate with PROGRAM_ID
+}
+
+source: sir_event_data is duckdb.table('./UAC_SIR_EVENT_DATA_TABLE.csv') extend{
+dimension:
+creation_date is try_strptime!date(`DATE_CREATED`, '%m/%d/%-y %H:%M')
+join_one:cate with PROGRAM_ID
+}
+source: category_id_table is duckdb.table('./UAC_SIR_CATEGORY_DATA_TABLE.csv') extend{
+primary_key:CATEGORY_ID
+}
+source: category_map_data is duckdb.table('./UAC_SIR_CATEGORY_MAP_DATA_TABLE.csv') extend{
+join_one:category_id_table with CATEGORY_ID
+}
+
+
+
+
+>>>markdown
+Which agency help the most of the cases?
+>>>malloy
+run: incident -> {
+    --group_by: NAICS_SP
+    --group_by:notify_date
+    group_by:AGENCY_TITLE
+    --group_by:METHOD_OF_NOTIFICATION
+    --group_by:METHOD_OF_NOTIFICATION
+    aggregate:num_incident is count()
+}
+>>>malloy
+run: cate -> {
+    --group_by: NAICS_SP
+    --group_by:notify_date
+    group_by:CAPACITY
+    --group_by:METHOD_OF_NOTIFICATION
+    --group_by:METHOD_OF_NOTIFICATION
+    aggregate:num_incident is count()
+}
+>>>malloy
+run: cate -> {
+    --group_by: NAICS_SP
+    --group_by:notify_date
+    group_by:ISACTIVE
+    --group_by:METHOD_OF_NOTIFICATION
+    --group_by:METHOD_OF_NOTIFICATION
+    aggregate:num_incident is count()
+}
+>>>markdown
+How many incidents in those 5 categories?
+>>>malloy
+run: abuse_allegation -> {
+    --group_by: NAICS_SP
+    --group_by:notify_date
+    --group_by:ABUSE_TYPE_ID
+    group_by:abuse_id.ABUSE_TYPE
+    --group_by:METHOD_OF_NOTIFICATION
+    --group_by:METHOD_OF_NOTIFICATION
+    aggregate:num_incident is count()
+}
+>>>malloy
+run: mm_allegation -> {
+    --group_by: NAICS_SP
+    --group_by:notify_date
+    --group_by:ABUSE_TYPE_ID
+    group_by:mm_id.MEDICAL_MENTAL_ISSUE
+    --group_by:METHOD_OF_NOTIFICATION
+    --group_by:METHOD_OF_NOTIFICATION
+    aggregate:num_incident is count()
+}
+>>>markdown
+Where did those program level incidents happened?
+>>>malloy
+run: program_allegation -> {
+    group_by:cate.PROGRAM_NAME
+    group_by:cate.STATE
+    aggregate:num_incident is count()
+}
+>>>malloy
+run: program_allegation -> {
+    group_by:cate.PROGRAM_NAME
+    group_by:cate.MAIL_STATE
+    aggregate:num_incident is count()
+}
+>>>malloy
+run: program_allegation -> {
+    --group_by:cate.PROGRAM_NAME
+    group_by:cate.MAIL_STATE
+    aggregate:num_incident is count()
+}
+>>>malloy
+run: sir_event_data -> {
+    group_by:cate.PROGRAM_NAME
+    group_by:creation_date.year
+    --group_by:program_allegation.SPECIFY_CATEGORY
+    aggregate:num_incident is count()
+}
+>>>malloy
+run: category_map_data -> {
+    group_by:category_id_table.DESCRIPTION
+    group_by:CATEGORY_ID
+    order_by:CATEGORY_ID asc
+    --group_by:program_allegation.SPECIFY_CATEGORY
+    aggregate:num_incident is count()
+}
+>>>malloy
+run: category_map_data -> {
+    group_by:category_id_table.DESCRIPTION
+    group_by:CATEGORY_ID
+    --group_by:SIR_ID
+    aggregate:num_incident is count()
+    order_by:num_incident desc
+}
