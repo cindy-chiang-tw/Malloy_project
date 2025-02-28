@@ -1,4 +1,4 @@
-###Malloy Project
+Malloy Project
 This repository contains an analytical project using Malloy, a modern language for data modeling and querying. The project leverages Malloy's capabilities to analyze incidents and program-level event data, integrating multiple datasets with relationships across abuse allegations, medical/mental health issues, and agency notifications.
 
 📂 Project Structure
