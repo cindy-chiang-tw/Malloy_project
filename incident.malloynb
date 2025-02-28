@@ -41,6 +41,29 @@ join_one:category_id_table with CATEGORY_ID
 
 
 >>>markdown
+Count total incidents recorded
+>>>malloy
+run: incident -> {
+    aggregate: total_incidents is count()
+}
+>>>markdown
+Count incidents by agency
+>>>malloy
+run: incident -> {
+    group_by: AGENCY_TITLE
+    aggregate: num_incidents is count()
+    order_by: num_incidents desc
+}
+>>>markdown
+Top 5 agencies with the highest number of incidents
+>>>malloy
+run: incident -> {
+    group_by: AGENCY_TITLE
+    aggregate: num_incidents is count()
+    order_by: num_incidents desc
+    limit: 5
+}
+>>>markdown
 Which agency help the most of the cases?
 >>>malloy
 run: incident -> {
@@ -50,6 +73,13 @@ run: incident -> {
     --group_by:METHOD_OF_NOTIFICATION
     --group_by:METHOD_OF_NOTIFICATION
     aggregate:num_incident is count()
+    limit:1
+}
+>>>markdown
+Unique number of agencies reporting incidents
+>>>malloy
+run: incident -> {
+    aggregate: unique_agencies is count(AGENCY_TITLE)
 }
 >>>malloy
 run: cate -> {
