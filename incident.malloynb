@@ -41,13 +41,67 @@ join_one:category_id_table with CATEGORY_ID
 
 
 >>>markdown
-Count total incidents recorded
+1. Count incidents by agency_Bar chart
+>>>malloy
+# bar_chart
+run: incident -> {
+    group_by: AGENCY_TITLE
+    aggregate: num_incidents is count()
+    order_by: num_incidents desc
+}
+>>>markdown
+2. Incidents by Notification List Subtype_Line chart
+>>>malloy
+# bar_chart
+run: incident -> {
+  group_by: NOTIFICATION_LIST_TYPE_SUB
+  aggregate: incident_count is count()
+}
+>>>markdown
+3. Incidents by Notification Method_Bar chart
+>>>malloy
+# bar_chart
+run: incident -> {
+  group_by: METHOD_OF_NOTIFICATION
+  aggregate: incident_count is count()
+}
+>>>markdown
+4. Abuse type allocation_Bar chart
+>>>malloy
+# bar_chart
+run: abuse_allegation -> {
+    --group_by: NAICS_SP
+    --group_by:notify_date
+    --group_by:ABUSE_TYPE_ID
+    group_by:abuse_id.ABUSE_TYPE
+    --group_by:METHOD_OF_NOTIFICATION
+    --group_by:METHOD_OF_NOTIFICATION
+    aggregate:num_incident is count()
+}
+>>>markdown
+5. Program level case allocation_ Bar chart
+>>>malloy
+# bar_chart
+run: program_allegation -> {
+    group_by:cate.PROGRAM_NAME
+    group_by:cate.STATE
+    aggregate:num_incident is count()
+}
+>>>markdown
+6. Count total incidents recorded
 >>>malloy
 run: incident -> {
     aggregate: total_incidents is count()
 }
 >>>markdown
-Count incidents by agency
+7. Incidents by Notification List Subtype
+>>>malloy
+run: incident -> {
+  group_by: NOTIFICATION_LIST_TYPE_SUB
+  aggregate: incident_count is count()
+}
+>>>markdown
+8. Count incidents by agency
 >>>malloy
 run: incident -> {
     group_by: AGENCY_TITLE
@@ -55,7 +109,7 @@ run: incident -> {
     order_by: num_incidents desc
 }
 >>>markdown
-Top 5 agencies with the highest number of incidents
+9. Top 5 agencies with the highest number of incidents
 >>>malloy
 run: incident -> {
     group_by: AGENCY_TITLE
@@ -64,7 +118,7 @@ run: incident -> {
     limit: 5
 }
 >>>markdown
-Which agency help the most of the cases?
+10. Which agency help the most of the cases?
 >>>malloy
 run: incident -> {
     --group_by: NAICS_SP
@@ -76,11 +130,7 @@ run: incident -> {
     limit:1
 }
 >>>markdown
-Unique number of agencies reporting incidents
->>>malloy
-run: incident -> {
-    aggregate: unique_agencies is count(AGENCY_TITLE)
-}
+11. Case group by capacity
 >>>malloy
 run: cate -> {
     --group_by: NAICS_SP
@@ -90,6 +140,8 @@ run: cate -> {
     --group_by:METHOD_OF_NOTIFICATION
     aggregate:num_incident is count()
 }
+>>>markdown
+12. Case group by active status
 >>>malloy
 run: cate -> {
     --group_by: NAICS_SP
@@ -100,7 +152,7 @@ run: cate -> {
     aggregate:num_incident is count()
 }
 >>>markdown
-How many incidents in those 5 categories?
+13. How many incidents in those 5 categories?
 >>>malloy
 run: abuse_allegation -> {
     --group_by: NAICS_SP
@@ -111,6 +163,8 @@ run: abuse_allegation -> {
     --group_by:METHOD_OF_NOTIFICATION
     aggregate:num_incident is count()
 }
+>>>markdown
+14. Case group by medical or mental issue
 >>>malloy
 run: mm_allegation -> {
     --group_by: NAICS_SP
@@ -122,25 +176,31 @@ run: mm_allegation -> {
     aggregate:num_incident is count()
 }
 >>>markdown
-Where did those program level incidents happened?
+15. Where did those program level incidents happened?
 >>>malloy
 run: program_allegation -> {
     group_by:cate.PROGRAM_NAME
     group_by:cate.STATE
     aggregate:num_incident is count()
 }
+>>>markdown
+16. Program level case group by mail state & program name
 >>>malloy
 run: program_allegation -> {
     group_by:cate.PROGRAM_NAME
     group_by:cate.MAIL_STATE
     aggregate:num_incident is count()
 }
+>>>markdown
+17. Program level case only group by mail state
 >>>malloy
 run: program_allegation -> {
     --group_by:cate.PROGRAM_NAME
     group_by:cate.MAIL_STATE
     aggregate:num_incident is count()
 }
+>>>markdown
+18. program level event group by creation date
 >>>malloy
 run: sir_event_data -> {
     group_by:cate.PROGRAM_NAME
@@ -148,6 +208,8 @@ run: sir_event_data -> {
     --group_by:program_allegation.SPECIFY_CATEGORY
     aggregate:num_incident is count()
 }
+>>>markdown
+19. Accidents location group by description
 >>>malloy
 run: category_map_data -> {
     group_by:category_id_table.DESCRIPTION
@@ -156,6 +218,8 @@ run: category_map_data -> {
     --group_by:program_allegation.SPECIFY_CATEGORY
     aggregate:num_incident is count()
 }
+>>>markdown
+20. Accidents location group by description and order by amount
 >>>malloy
 run: category_map_data -> {
     group_by:category_id_table.DESCRIPTION
@@ -163,4 +227,151 @@ run: category_map_data -> {
     --group_by:SIR_ID
     aggregate:num_incident is count()
     order_by:num_incident desc
+}
+>>>markdown
+21. Incidents by User Created
+>>>malloy
+run: incident -> {
+  group_by: USER_CREATED
+  aggregate: incident_count is count()
+}
+>>>markdown
+22. Incidents by Uptime
+>>>malloy
+run: incident -> {
+  group_by: UPTIME
+  aggregate: incident_count is count()
+}
+>>>markdown
+23. Incidents by Upuser
+>>>malloy
+run: incident -> {
+  group_by: UPUSER
+  aggregate: incident_count is count()
+}
+>>>markdown
+24. Incidents by Deletion Status
+>>>malloy
+run: incident -> {
+  group_by: ISDELETED
+  aggregate: incident_count is count()
+}
+>>>markdown
+25. Incidents by Addendum ID
+>>>malloy
+run: incident -> {
+  group_by: ADDENDUM_ID
+  aggregate: incident_count is count()
+}
+>>>markdown
+26. Incidents by Follow-up Report ID
+>>>malloy
+run: incident -> {
+  group_by: SA_FOLLOWUP_RPT_ID
+  aggregate: incident_count is count()
+}
+>>>markdown
+27. Incidents by Other Explain
+>>>malloy
+run: incident -> {
+  group_by: OTHER_EXPLAIN
+  aggregate: incident_count is count()
+}
+>>>markdown
+28. Incidents by Display Order
+>>>malloy
+run: incident -> {
+  group_by: DISPLAY_ORDER
+  aggregate: incident_count is count()
+}
+>>>markdown
+29. Incidents by Notification List ID
+>>>malloy
+run: incident -> {
+  group_by: NOTIFICATION_LIST_ID
+  aggregate: incident_count is count()
+}
+>>>markdown
+30. Incidents by UAC SIR ID
+>>>malloy
+run: incident -> {
+  group_by: UAC_SIR_ID
+  aggregate: incident_count is count()
+}
+>>>markdown
+31. Incidents by Date Created
+>>>malloy
+run: incident -> {
+  group_by: DATE_CREATED
+  aggregate: incident_count is count()
+}
+>>>markdown
+32. Common staff responses in program events
+>>>malloy
+run: program_allegation -> {
+  group_by: STAFF_RESPONSE
+  aggregate: event is count()
+  order_by: event desc
+}
+>>>markdown
+33. Programs with state case numbers assigned
+>>>malloy
+run: program_allegation -> {
+  where: STATE_CASE_NUMBER IS NOT NULL
+  group_by: PROGRAM_ID
+  aggregate: event is count()
+}
+>>>markdown
+34. Programs with law case numbers assigned
+>>>malloy
+run: program_allegation -> {
+  where: LAW_CASE_NUMBER IS NOT NULL
+  group_by: PROGRAM_ID
+  aggregate: event is count()
+}
+>>>markdown
+35. Programs with most evacuations
+>>>malloy
+run: program_allegation -> {
+  where: IS_EVACUATED = 1
+  group_by: PROGRAM_ID
+  aggregate: event is count()
+}
+>>>markdown
+36. Programs with most injury-related incidents
+>>>malloy
+run: program_allegation -> {
+  where: IS_INJURED = 1
+  group_by: PROGRAM_ID
+  aggregate: event is count()
+}
+>>>markdown
+37. Most active users in program events (updates)
+>>>malloy
+run: program_allegation -> {
+  group_by: USER_UPDATED
+  aggregate: event is count()
+  order_by: event desc
+}
+>>>markdown
+38. Most active users in program events (creation)
+>>>malloy
+run: program_allegation -> {
+  group_by: USER_CREATED
+  aggregate: event is count()
+  order_by: event desc
+}
+>>>markdown
+39. Event updates by user in programs
+>>>malloy
+run: program_allegation -> {
+  group_by: USER_UPDATED, PROGRAM_ID
+  aggregate: update_count is count()
+}
+>>>markdown
+40. Event creation by user in programs
+>>>malloy
+run: program_allegation -> {
+  group_by: USER_CREATED, PROGRAM_ID
+  aggregate: event_count is count()
 }
